@@ -1,5 +1,0 @@
-pip install aiogram
-
-cd Desktop/navbat_bot
-python main.py
-Jamshid0000
