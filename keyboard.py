@@ -1,23 +1,16 @@
-from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton
-from config import ADMIN_ID
+from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 
-def user_menu():
-    keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
-    keyboard.add(KeyboardButton("📋 Navbat ro‘yxati"))
-    keyboard.add(KeyboardButton("📝 Navbat olish"), KeyboardButton("❌ Navbatimni bekor qilish"))
-    return keyboard
+# Foydalanuvchilar uchun tugmalar
+user_buttons = ReplyKeyboardMarkup(resize_keyboard=True)
+user_buttons.add(KeyboardButton("Navbat ro'yxati"))
+user_buttons.add(KeyboardButton("Navbatga yozilish"))
+user_buttons.add(KeyboardButton("Navbatni bekor qilish"))
 
-def admin_menu():
-    keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
-    keyboard.add(KeyboardButton("🚀 Navbatni boshlash"))
-    keyboard.add(KeyboardButton("📝 Navbat olish"), KeyboardButton("📋 Navbat ro‘yxati"))
-    keyboard.add(KeyboardButton("❌ Navbatni bekor qilish"), KeyboardButton("🔄 Navbatni yangilash"))
-    keyboard.add(KeyboardButton("🎲 Navbatni tasodifiy tanlash"))
-    return keyboard
-
-def navbat_raqamlari(navbatlar):
-    keyboard = InlineKeyboardMarkup()
-    for number, user in navbatlar.items():
-        if user is None:
-            keyboard.add(InlineKeyboardButton(str(number), callback_data=f"take_{number}"))
-    return keyboard
+# Admin uchun tugmalar
+admin_buttons = ReplyKeyboardMarkup(resize_keyboard=True)
+admin_buttons.add(KeyboardButton("Navbatni boshlash"))
+admin_buttons.add(KeyboardButton("Navbat olish"))
+admin_buttons.add(KeyboardButton("Navbat ro'yxati"))
+admin_buttons.add(KeyboardButton("Navbatni bekor qilish"))
+admin_buttons.add(KeyboardButton("Navbatni yangilash"))
+admin_buttons.add(KeyboardButton("Navbatni tasodifiy tanlash"))
