@@ -1,12 +1,10 @@
-import logging
-from aiogram import Bot, Dispatcher, types
-from aiogram.contrib.fsm_storage.memory import MemoryStorage
+from aiogram import Bot, Dispatcher
+from aiogram.types import Message
+from aiogram.filters import Command
+import asyncio
 import os
 
-TOKEN = os.getenv("7923166429:AAG6JQH1xfilj8135oe-fKjC-IGNnw48RNE")  # Tokenni Render yoki .env faylga joylashtiring
+TOKEN = "7923166429:AAG6JQH1xfilj8135oe-fKjC-IGNnw48RNE"
 
-logging.basicConfig(level=logging.INFO)
-
-bot = Bot(token=TOKEN, parse_mode=types.ParseMode.HTML)
-storage = MemoryStorage()
-dp = Dispatcher(bot, storage=storage)
+bot = Bot(token=TOKEN)
+dp = Dispatcher()
