@@ -1,68 +1,50 @@
 from aiogram import types
 from bot import dp, bot
 from config import ADMIN_ID
-from keyboard import user_keyboard, admin_keyboard
+from queue_system import navbatlar, get_queue_text, reset_queue, shuffle_queue
+from keyboard import user_menu, admin_menu, navbat_olish_tugmalari
 
-# Navbatni saqlash uchun ro‘yxat
-queue = []
-
-
-# Start komandasi
-@dp.message_handler(commands=["start"])
-async def send_welcome(message: types.Message):
+@dp.message_handler(commands=['start'])
+async def start_command(message: types.Message):
     if message.from_user.id == ADMIN_ID:
-        await message.answer("Salom Admin! Sizning buyruqlaringiz:", reply_markup=admin_keyboard)
+        await message.answer("👋 Admin paneliga xush kelibsiz!", reply_markup=admin_menu())
     else:
-        await message.answer("Salom! Navbat olish yoki ko‘rish uchun tugmalarni bosing.", reply_markup=user_keyboard)
+        await message.answer("👋 Xush kelibsiz! \nBu bot orqali navbat olish mumkin.", reply_markup=user_menu())
 
+@dp.callback_query_handler(lambda c: c.data == "show_list")
+async def show_list(callback_query: types.CallbackQuery):
+    await bot.send_message(callback_query.from_user.id, get_queue_text(), parse_mode="Markdown")
 
-# Navbat olish
-@dp.message_handler(lambda message: message.text == "Navbat olish")
-async def get_queue(message: types.Message):
-    user_id = message.from_user.id
-    username = message.from_user.username or message.from_user.full_name
-
-    if user_id not in [user["id"] for user in queue]:  # Agar foydalanuvchi navbatda bo‘lmasa
-        queue.append({"id": user_id, "name": username})
-        await message.answer(f"✅ {username}, siz navbatga qo‘shildingiz!\n\n" + get_queue_list())
+@dp.callback_query_handler(lambda c: c.data == "register")
+async def register(callback_query: types.CallbackQuery):
+    available_slots = [num for num, user in navbatlar.items() if user is None]
+    if available_slots:
+        await bot.send_message(callback_query.from_user.id, "⏳ Qaysi navbatni tanlaysiz?", reply_markup=navbat_olish_tugmalari(available_slots))
     else:
-        await message.answer("⛔ Siz allaqachon navbatdasiz!")
+        await bot.send_message(callback_query.from_user.id, "❌ Hamma joy band!")
 
-
-# Navbat ro‘yxati
-@dp.message_handler(lambda message: message.text == "Navbat ro'yxati")
-async def show_queue(message: types.Message):
-    await message.answer(get_queue_list())
-
-
-# Navbatni bekor qilish
-@dp.message_handler(lambda message: message.text == "Navbatni bekor qilish")
-async def cancel_queue(message: types.Message):
-    global queue
-    user_id = message.from_user.id
-
-    queue = [user for user in queue if user["id"] != user_id]
-    await message.answer("❌ Sizning navbatingiz bekor qilindi!")
-
-
-# Navbatni yangilash (Admin)
-@dp.message_handler(lambda message: message.text == "Navbatni yangilash")
-async def refresh_queue(message: types.Message):
-    if message.from_user.id == ADMIN_ID:
-        global queue
-        queue.clear()
-        await message.answer("🔄 Navbat yangilandi!")
+@dp.callback_query_handler(lambda c: c.data.startswith("take_"))
+async def take_slot(callback_query: types.CallbackQuery):
+    number = int(callback_query.data.split("_")[1])
+    if navbatlar[number] is None:
+        user = callback_query.from_user
+        navbatlar[number] = {"name": user.full_name, "username": user.username}
+        await bot.send_message(callback_query.from_user.id, f"✅ Siz {number}-navbatni oldingiz!\n\n{get_queue_text()}", parse_mode="Markdown")
     else:
-        await message.answer("⚠️ Siz bu amalni bajara olmaysiz!")
+        await bot.send_message(callback_query.from_user.id, "❌ Bu joy allaqachon band!")
 
+@dp.callback_query_handler(lambda c: c.data == "reset_queue")
+async def reset_queue_handler(callback_query: types.CallbackQuery):
+    if callback_query.from_user.id == ADMIN_ID:
+        reset_queue()
+        await bot.send_message(callback_query.from_user.id, "♻️ Navbat yangilandi!")
+    else:
+        await bot.send_message(callback_query.from_user.id, "❌ Sizda bu amalni bajarish huquqi yo‘q!")
 
-# Navbat ro‘yxatini chiqaruvchi funksiya
-def get_queue_list():
-    if not queue:
-        return "📭 Navbat hozircha bo‘sh!"
-
-    text = "📋 **Navbat ro‘yxati:**\n"
-    for idx, user in enumerate(queue, start=1):
-        text += f"{idx}. {user['name']}\n"
-
-    return text
+@dp.callback_query_handler(lambda c: c.data == "shuffle_queue")
+async def shuffle_queue_handler(callback_query: types.CallbackQuery):
+    if callback_query.from_user.id == ADMIN_ID:
+        shuffle_queue()
+        await bot.send_message(callback_query.from_user.id, "🎲 Navbat tasodifiy joylashtirildi!")
+    else:
+        await bot.send_message(callback_query.from_user.id, "❌ Sizda bu amalni bajarish huquqi yo‘q!")

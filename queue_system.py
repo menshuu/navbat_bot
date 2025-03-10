@@ -4,8 +4,14 @@ import random
 navbatlar = ["Bo'sh"] * 33
 
 def get_queue_text():
-    """Navbatni matn ko'rinishida qaytaradi."""
-    return "\n".join([f"{i+1}. {x}" for i, x in enumerate(navbatlar)])
+    text = "📋 *Navbat ro‘yxati:*\n"
+    for number, user in navbatlar.items():
+        if user:
+            text += f"{number}. @{user['username']}" if user['username'] else f"{number}. {user['name']}\n"
+        else:
+            text += f"{number}. Bo‘sh\n"
+    return text
+
 
 def add_to_queue(username, index):
     """Foydalanuvchini berilgan joyga qo'shadi."""
