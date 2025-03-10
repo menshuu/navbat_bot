@@ -1,7 +1,7 @@
 import random
+from config import MAX_NAVBAT
 
-# 33 ta joyni bo'sh qilib boshlaymiz
-navbatlar = ["Bo'sh"] * 33
+navbatlar = {i: None for i in range(1, MAX_NAVBAT + 1)}
 
 def get_queue_text():
     text = "📋 *Navbat ro‘yxati:*\n"
@@ -12,30 +12,15 @@ def get_queue_text():
             text += f"{number}. Bo‘sh\n"
     return text
 
-
-def add_to_queue(username, index):
-    """Foydalanuvchini berilgan joyga qo'shadi."""
-    if navbatlar[index] == "Bo'sh":
-        navbatlar[index] = username
-        return True
-    return False
-
-def remove_from_queue(username):
-    """Foydalanuvchini navbatdan olib tashlaydi."""
-    for i in range(len(navbatlar)):
-        if navbatlar[i] == username:
-            navbatlar[i] = "Bo'sh"
-            return True
-    return False
-
 def reset_queue():
-    """Navbatni to'liq tozalaydi."""
     global navbatlar
-    navbatlar = ["Bo'sh"] * 33
+    navbatlar = {i: None for i in range(1, MAX_NAVBAT + 1)}
 
 def shuffle_queue():
-    """Navbatni tasodifiy aralashtiradi."""
-    occupied = [x for x in navbatlar if x != "Bo'sh"]
-    random.shuffle(occupied)
-    for i in range(len(navbatlar)):
-        navbatlar[i] = occupied.pop(0) if occupied else "Bo'sh"
+    global navbatlar
+    occupied_slots = [k for k, v in navbatlar.items() if v]
+    random.shuffle(occupied_slots)
+    new_navbatlar = {i: None for i in range(1, MAX_NAVBAT + 1)}
+    for i, slot in enumerate(occupied_slots, start=1):
+        new_navbatlar[i] = navbatlar[slot]
+    navbatlar = new_navbatlar

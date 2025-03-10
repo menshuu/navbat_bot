@@ -1,16 +1,21 @@
-from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
-# Foydalanuvchilar uchun tugmalar
-user_keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
-user_keyboard.add(KeyboardButton("Navbat olish"))
-user_keyboard.add(KeyboardButton("Navbat ro'yxati"))
-user_keyboard.add(KeyboardButton("Navbatni bekor qilish"))
+def user_menu():
+    keyboard = InlineKeyboardMarkup()
+    keyboard.add(InlineKeyboardButton("📋 Navbat ro‘yxati", callback_data="show_list"))
+    keyboard.add(InlineKeyboardButton("📝 Navbatga yozilish", callback_data="register"))
+    keyboard.add(InlineKeyboardButton("❌ Navbatni bekor qilish", callback_data="cancel_queue"))
+    return keyboard
 
-# Admin uchun tugmalar
-admin_keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
-admin_keyboard.add(KeyboardButton("Navbatni boshlash"))
-admin_keyboard.add(KeyboardButton("Navbat olish"))
-admin_keyboard.add(KeyboardButton("Navbat ro'yxati"))
-admin_keyboard.add(KeyboardButton("Navbatni bekor qilish"))
-admin_keyboard.add(KeyboardButton("Navbatni yangilash"))
-admin_keyboard.add(KeyboardButton("Navbatni tasodifiy tanlash"))
+def admin_menu():
+    keyboard = user_menu()
+    keyboard.add(InlineKeyboardButton("🔄 Navbatni yangilash", callback_data="reset_queue"))
+    keyboard.add(InlineKeyboardButton("🎲 Navbatni tasodifiy tanlash", callback_data="shuffle_queue"))
+    keyboard.add(InlineKeyboardButton("🚀 Navbatni boshlash", callback_data="start_queue"))
+    return keyboard
+
+def navbat_olish_tugmalari(available_slots):
+    keyboard = InlineKeyboardMarkup(row_width=4)
+    for number in available_slots:
+        keyboard.insert(InlineKeyboardButton(str(number), callback_data=f"take_{number}"))
+    return keyboard
