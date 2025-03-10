@@ -1,9 +1,6 @@
-from aiogram import Bot, Dispatcher, executor, types
-from config import TOKEN
-from handlers import dp  # `handlers.py` faylingizda `dp` aniqlangan bo‘lishi kerak
-
-bot = Bot(token=TOKEN)
-dp = Dispatcher(bot)
+from aiogram import executor
+from bot import dp
+import handlers  # Barcha handlerlarni yuklab olamiz
 
 if __name__ == "__main__":
     executor.start_polling(dp, skip_updates=True)
